@@ -1,0 +1,49 @@
+:root {
+  /* ── Surfaces ── */
+  --surface-app: #0D1520;
+  --surface-card: #162032;
+  --surface-card-hover: #1C2940;
+  --surface-elevated: #1E2E45;
+  --surface-document: #F5F2EC;
+  --surface-edit-active: #FFFEF5;
+
+  /* ── Accent ── */
+  --accent-teal: #00D4AE;
+  --accent-teal-muted: rgba(0, 212, 174, 0.10);
+  --accent-teal-border: rgba(0, 212, 174, 0.20);
+
+  /* ── Status ── */
+  --status-complete: #34D399;
+  --status-complete-bg: rgba(52, 211, 153, 0.07);
+  --status-partial: #FBBF24;
+  --status-partial-bg: rgba(251, 191, 36, 0.07);
+  --status-missing: #F87171;
+  --status-missing-bg: rgba(248, 113, 113, 0.07);
+  --status-recording: #EF4444;
+  --status-recording-bg: rgba(239, 68, 68, 0.10);
+  --status-edited: #818CF8;
+  --status-edited-bg: rgba(129, 140, 248, 0.07);
+
+  /* ── Text ── */
+  --text-primary: #E8EDF5;
+  --text-secondary: #8899AA;
+  --text-tertiary: #556677;
+  --text-clinical: #1A2535;
+  --text-clinical-muted: #4A5568;
+
+  /* ── Borders ── */
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-default: rgba(255, 255, 255, 0.10);
+  --border-focus: rgba(0, 212, 174, 0.50);
+  --border-edit-active: rgba(0, 0, 0, 0.12);
+  --border-complete: rgba(52, 211, 153, 0.40);
+  --border-partial: rgba(251, 191, 36, 0.40);
+  --border-missing: rgba(248, 113, 113, 0.40);
+  --border-active: #00D4AE;
+
+  /* ── Shadows ── */
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.2);
+  --shadow-modal: 0 20px 60px rgba(0, 0, 0, 0.6), 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-edit-focus: 0 0 0 3px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.08);
+}
