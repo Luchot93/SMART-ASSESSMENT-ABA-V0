@@ -11,6 +11,32 @@
       href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Lora:wght@400;600&display=swap"
       rel="stylesheet"
     />
+    <!-- GitHub Pages SPA redirect decode -->
+    <script>
+      (function() {
+        var redirect = sessionStorage.redirect;
+        delete sessionStorage.redirect;
+        if (redirect && redirect !== location.href) {
+          history.replaceState(null, null, redirect);
+        }
+        // Also decode the ?p= query param set by 404.html
+        var search = window.location.search;
+        if (search.slice(1, 3) === 'p=') {
+          var decoded = search.slice(1).split('&').reduce(function(p, s) {
+            var parts = s.split('=');
+            p[decodeURIComponent(parts[0])] = parts.slice(1).join('=').replace(/~and~/g, '&');
+            return p;
+          }, {});
+          if (decoded.p !== undefined) {
+            window.history.replaceState(
+              null, null,
+              window.location.pathname.slice(0, -1) + (decoded.p || '') +
+              (decoded.q ? '?' + decoded.q : '') + window.location.hash
+            );
+          }
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

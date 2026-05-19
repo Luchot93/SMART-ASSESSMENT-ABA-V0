@@ -231,7 +231,7 @@ export const InlineEditor = ({ sessionId, sectionKey, draftContent }: InlineEdit
           className="absolute bottom-2 right-3 text-[11px] transition-opacity duration-300"
           style={{
             color: saveState === 'saved' ? 'var(--status-complete)' : 'var(--text-tertiary)',
-            opacity: saveState === 'idle' ? 0 : 1,
+            opacity: 1,
           }}
         >
           {saveState === 'saving' ? 'saving…' : '✓ Saved'}
