@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
+import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from '@/components/layout';
 import { ToastProvider } from '@/components/ui';
 import DesignTokens from '@/pages/DesignTokens';
@@ -9,7 +9,7 @@ import ReviewPage from '@/pages/ReviewPage';
 
 const App = () => (
   <ToastProvider>
-    <BrowserRouter basename="/SMART-ASSESSMENT-ABA-V0">
+    <HashRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/assessments" replace />} />
 
@@ -22,7 +22,7 @@ const App = () => (
 
         <Route path="/tokens" element={<DesignTokens />} />
       </Routes>
-    </BrowserRouter>
+    </HashRouter>
   </ToastProvider>
 );
 
