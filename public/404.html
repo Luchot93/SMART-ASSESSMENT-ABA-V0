@@ -1,21 +1,4 @@
 <!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Smart Assessment</title>
-    <script>
-      // Single-Page App redirect for GitHub Pages
-      // Encodes the current path into a query parameter and redirects to index.html
-      // The script in index.html will decode it and restore the URL before React loads.
-      var l = window.location;
-      l.replace(
-        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
-        l.pathname.split('/').slice(0, 2).join('/') +
-        '/?p=/' + l.pathname.slice(1).split('/').slice(1).join('/').replace(/&/g, '~and~') +
-        (l.search ? '&q=' + l.search.slice(1).replace(/&/g, '~and~') : '') +
-        l.hash
-      );
-    </script>
-  </head>
-  <body></body>
-</html>
+<html><head><meta charset="UTF-8" />
+<script>window.location.replace('/SMART-ASSESSMENT-ABA-V0/');</script>
+</head><body></body></html>
