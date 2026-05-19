@@ -9,7 +9,7 @@ import ReviewPage from '@/pages/ReviewPage';
 
 const App = () => (
   <ToastProvider>
-    <BrowserRouter>
+    <BrowserRouter basename="/SMART-ASSESSMENT-ABA-V0">
       <Routes>
         <Route path="/" element={<Navigate to="/assessments" replace />} />
 
