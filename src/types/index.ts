@@ -26,6 +26,37 @@ export interface BehavioralIndicator {
   unit: 'count' | 'duration' | 'tag';
 }
 
+export type TeachingStrategyKey =
+  | 'dtt' | 'net' | 'fct' | 'behavioral_momentum' | 'errorless_teaching'
+  | 'most_to_least' | 'least_to_most' | 'graduated_guidance' | 'modeling'
+  | 'chaining' | 'prompt_fading' | 'visual_supports' | 'task_analysis'
+  | 'incidental_teaching' | 'differential_reinforcement' | 'role_modeling'
+  | 'social_stories' | 'reinforcement_procedures';
+
+export type PromptingLevel =
+  | 'independent' | 'verbal' | 'gestural' | 'model'
+  | 'partial_physical' | 'full_physical' | 'combination';
+
+export interface SkillAcquisitionGoal {
+  id: string;
+  targetSkill: string;
+  operationalDefinition: string;
+  definitionIsAiGenerated: boolean;
+  definitionIsLoading: boolean;
+  teachingStrategies: TeachingStrategyKey[];
+  teachingStrategiesOther: string;
+  promptingLevel: PromptingLevel | null;
+  promptingLevelCombination: string;
+  baselinePercent: string;
+  baselineOpportunities: string;
+  baselinePromptingDesc: string;
+  masteryCriteriaPercent: string;
+  masteryCriteriaSessions: string;
+  masteryCriteriaSettings: string;
+  masteryCriteriaPrompting: string;
+  generalizationNotes: string;
+}
+
 export interface Section {
   key: SectionKey;
   title: string;
@@ -42,6 +73,7 @@ export interface Section {
   draftState: DraftState;
   approvalState: ApprovalState;
   lastSavedAt: string | null;
+  skillGoals: SkillAcquisitionGoal[];
 }
 
 export interface ClientProfile {

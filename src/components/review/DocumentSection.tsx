@@ -105,8 +105,10 @@ export const DocumentSection = ({ sessionId, sectionKey, config }: DocumentSecti
         >
           <Info size={13} style={{ color: '#60A5FA', flexShrink: 0, marginTop: 1 }} />
           <p className="text-[12px]" style={{ color: '#1E40AF' }}>
-            This section was drafted from your notes. Skill Acquisitions UI is in development —
-            review carefully before approving.
+            Generated from the skill acquisition goals captured during the interview.
+            Each goal includes the operational definition, baseline data, teaching strategies,
+            and mastery criteria. Review carefully — refine any placeholder text marked
+            [BCBA to complete] before approving.
           </p>
         </div>
       )}

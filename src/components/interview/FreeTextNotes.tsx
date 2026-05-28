@@ -16,6 +16,10 @@ export const FreeTextNotes = ({ sessionId, sectionKey }: FreeTextNotesProps) => 
     (s) =>
       s.sessions.find((sess) => sess.id === sessionId)?.sections[sectionKey]?.notes ?? '',
   );
+  const transcript = useSessionStore(
+    (s) =>
+      s.sessions.find((sess) => sess.id === sessionId)?.sections[sectionKey]?.transcript ?? null,
+  );
   const updateSectionNotes = useSessionStore((s) => s.updateSectionNotes);
 
   const [value, setValue] = useState(storeNotes);
@@ -50,6 +54,25 @@ export const FreeTextNotes = ({ sessionId, sectionKey }: FreeTextNotesProps) => 
           {saveLabel}
         </span>
       </div>
+
+      {/* Recording pill — shown when a transcript has been captured */}
+      {transcript !== null && (
+        <span
+          style={{
+            fontSize: '11px',
+            background: 'rgba(0,212,174,0.08)',
+            border: '1px solid rgba(0,212,174,0.20)',
+            color: 'var(--accent-teal)',
+            borderRadius: '999px',
+            padding: '1px 8px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+          }}
+        >
+          🎙 Recording captured — AI will use both
+        </span>
+      )}
 
       {/* Textarea — full-width on all breakpoints */}
       <textarea

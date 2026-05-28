@@ -7,4 +7,5 @@ export { RecordButton } from './RecordButton';
 export { SectionCard } from './SectionCard';
 export { SectionSidebar } from './SectionSidebar';
 export { SkillAcquisitionsPanel } from './SkillAcquisitionsPanel';
+export { SkillGoalCard } from './SkillGoalCard';
 export { TranscriptPanel } from './TranscriptPanel';

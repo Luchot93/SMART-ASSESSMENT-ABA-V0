@@ -8,6 +8,7 @@ import type {
   SectionKey,
   Session,
   SessionStatus,
+  SkillAcquisitionGoal,
 } from '@/types';
 import { mockSessions } from './mockData';
 
@@ -71,6 +72,12 @@ interface StoreActions {
   ) => void;
   markSectionEdited: (sessionId: string, sectionKey: SectionKey) => void;
   revertToAiOriginal: (sessionId: string, sectionKey: SectionKey) => void;
+
+  // Skill acquisition goals
+  addSkillGoal: (sessionId: string) => void;
+  updateSkillGoal: (sessionId: string, goalId: string, patch: Partial<SkillAcquisitionGoal>) => void;
+  removeSkillGoal: (sessionId: string, goalId: string) => void;
+  reorderSkillGoals: (sessionId: string, fromIndex: number, toIndex: number) => void;
 
   // Demographics form
   updateClientProfile: (sessionId: string, patch: Partial<ClientProfile>) => void;
@@ -149,6 +156,15 @@ const deriveDemographicsCompletion = (
   const filled = required.filter((v) => v.length > 0).length;
   if (filled === 0) return 'empty';
   if (filled === required.length) return 'complete';
+  return 'partial';
+};
+
+// Derive skill_acquisitions completion from structured goals array.
+const deriveSkillAcquisitionsCompletion = (
+  skillGoals: SkillAcquisitionGoal[],
+): Section['completionState'] => {
+  if (skillGoals.length === 0) return 'empty';
+  if (skillGoals.every((g) => g.targetSkill !== '' && g.operationalDefinition !== '')) return 'complete';
   return 'partial';
 };
 
@@ -326,6 +342,66 @@ export const useSessionStore = create<StoreState & StoreActions>()((set, get) =>
       })),
     })),
 
+  // ── Skill acquisition goals ───────────────────────────────────────────────
+
+  addSkillGoal: (sessionId) => {
+    const newGoal: SkillAcquisitionGoal = {
+      id: crypto.randomUUID(),
+      targetSkill: '',
+      operationalDefinition: '',
+      definitionIsAiGenerated: false,
+      definitionIsLoading: false,
+      teachingStrategies: [],
+      teachingStrategiesOther: '',
+      promptingLevel: null,
+      promptingLevelCombination: '',
+      baselinePercent: '',
+      baselineOpportunities: '',
+      baselinePromptingDesc: '',
+      masteryCriteriaPercent: '',
+      masteryCriteriaSessions: '',
+      masteryCriteriaSettings: '',
+      masteryCriteriaPrompting: '',
+      generalizationNotes: '',
+    };
+    set(({ sessions }) => ({
+      sessions: patchSection(sessions, sessionId, 'skill_acquisitions', (s) => ({
+        skillGoals: [...s.skillGoals, newGoal],
+      })),
+    }));
+    get().computeDerivedFields(sessionId);
+  },
+
+  updateSkillGoal: (sessionId, goalId, patch) => {
+    set(({ sessions }) => ({
+      sessions: patchSection(sessions, sessionId, 'skill_acquisitions', (s) => ({
+        skillGoals: s.skillGoals.map((g) =>
+          g.id === goalId ? { ...g, ...patch } : g,
+        ),
+      })),
+    }));
+    get().computeDerivedFields(sessionId);
+  },
+
+  removeSkillGoal: (sessionId, goalId) => {
+    set(({ sessions }) => ({
+      sessions: patchSection(sessions, sessionId, 'skill_acquisitions', (s) => ({
+        skillGoals: s.skillGoals.filter((g) => g.id !== goalId),
+      })),
+    }));
+    get().computeDerivedFields(sessionId);
+  },
+
+  reorderSkillGoals: (sessionId, fromIndex, toIndex) =>
+    set(({ sessions }) => ({
+      sessions: patchSection(sessions, sessionId, 'skill_acquisitions', (s) => {
+        const goals = [...s.skillGoals];
+        const [removed] = goals.splice(fromIndex, 1);
+        goals.splice(toIndex, 0, removed);
+        return { skillGoals: goals };
+      }),
+    })),
+
   // ── Demographics form ──────────────────────────────────────────────────────
 
   updateClientProfile: (sessionId, patch) =>
@@ -364,7 +440,15 @@ export const useSessionStore = create<StoreState & StoreActions>()((set, get) =>
   // ── Derived field recomputation ────────────────────────────────────────────
 
   computeDerivedFields: (sessionId) =>
-    set(({ sessions }) => ({ sessions: recount(sessions, sessionId) })),
+    set(({ sessions }) => {
+      const session = sessions.find((s) => s.id === sessionId);
+      if (!session) return { sessions };
+      const skillGoals = session.sections.skill_acquisitions.skillGoals;
+      const patched = patchSection(sessions, sessionId, 'skill_acquisitions', () => ({
+        completionState: deriveSkillAcquisitionsCompletion(skillGoals),
+      }));
+      return { sessions: recount(patched, sessionId) };
+    }),
 
   // ── Computed selectors ─────────────────────────────────────────────────────
 

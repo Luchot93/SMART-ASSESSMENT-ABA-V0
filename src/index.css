@@ -88,14 +88,28 @@
   outline-color: transparent;
 }
 
-/* ── Review page: inline editor ─────────────────────────────────── */
-.inline-editor-content {
-  outline: none;
-  white-space: pre-wrap;
-  word-break: break-word;
-  min-height: 80px;
+/* ── Review page: rendered Markdown view ────────────────────────── */
+.draft-markdown > *:first-child { margin-top: 0 !important; }
+.draft-markdown > *:last-child  { margin-bottom: 0 !important; }
+
+/* Table row hover */
+.draft-markdown .md-table-row:hover td { background: rgba(0, 0, 0, 0.018); }
+
+/* Remove right border on last column */
+.draft-markdown th:last-child,
+.draft-markdown td:last-child { border-right: none; }
+
+/* Last table row — no bottom border */
+.draft-markdown tbody tr:last-child td { border-bottom: none; }
+
+/* ── Hover-reveal pencil edit button ────────────────────────────── */
+.draft-markdown-wrapper .edit-pencil-btn {
+  opacity: 0;
+  transition: opacity 150ms ease;
 }
-.inline-editor-content br { display: block; content: ''; }
+.draft-markdown-wrapper:hover .edit-pencil-btn {
+  opacity: 1;
+}
 
 /* ── Demographics form input ─────────────────────────────────────── */
 .demo-input {

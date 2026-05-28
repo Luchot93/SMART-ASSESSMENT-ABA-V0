@@ -23,7 +23,8 @@ export function exportAssessment(
         approvalState: s.approvalState,
         content: s.draftContent ?? '',
         notes: s.notes,
-        hasTranscript: s.transcript !== null,
+        transcript: s.transcript ?? null,
+        transcriptFlagged: s.transcriptFlagged,
       };
     }
   }

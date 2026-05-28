@@ -19,6 +19,7 @@ const emptySection = (key: SectionKey): Section => ({
   draftState: 'blank',
   approvalState: 'pending',
   lastSavedAt: null,
+  skillGoals: [],
 });
 
 const makeSection = (key: SectionKey, overrides: Partial<Section> = {}): Section => {
@@ -45,7 +46,7 @@ const at = (daysAgo: number, h: number, m: number): string => {
   return d.toISOString();
 };
 
-// ─── Session 1: Marcus D. — in_progress, 6 of 10 interview sections ─────────
+// ─── Session 1: Marcus D. — in_progress, 10 of 10 interview sections ────────
 
 const T_MARCUS = at(0, 9, 15);
 
@@ -81,67 +82,250 @@ const marcusSession: Session = {
     reasonForReferral: 'Referred by Dr. R. Morales due to escalating behavioral challenges including task refusal, transition meltdowns, and caregiver-directed aggression. ABA evaluation and treatment planning requested.',
     interventionSettings: ['Home', 'Community'],
   },
-  sectionsWithData: 6,
+  sectionsWithData: 10,
   totalInterviewSections: 10,
   sectionsApproved: 0,
   sections: makeSections({
     demographics: {
       completionState: 'complete',
     },
+
     presenting_concerns: {
       completionState: 'complete',
+      recordingDurationSeconds: 612,
       notes:
-        'Parents report significant task avoidance and daily transition struggles. Severity: moderate-severe.',
+        'Parents report significant task avoidance and daily transition struggles. Severity: moderate-severe. Escalation over past 6 months since starting first grade. Prior ABA age 4 (6 mo) — discontinued due to relocation.',
       transcript:
-        'CAREGIVER: The main things are the meltdowns when we transition — every morning to school is a battle. And he refuses tasks constantly.\n' +
-        'BCBA: How long have these concerns been present?\n' +
-        "CAREGIVER: Since he was about 3. It's been getting worse.",
+        'BCBA: So to start, can you tell me what are the main reasons you reached out for ABA services for Marcus right now?\n' +
+        "CAREGIVER: Yeah, so the biggest thing is the meltdowns. Every single morning getting him ready for school is a battle. He refuses to get dressed, he won't come to the table for breakfast, and when we finally get to the door he just drops to the floor and screams.\n" +
+        'BCBA: How long has that morning routine been this difficult?\n' +
+        "CAREGIVER: Probably since he was three. He's seven now, so — four years. It's not gotten better. If anything it's gotten worse since he started first grade.\n" +
+        'BCBA: What does a meltdown look like at its worst?\n' +
+        "CAREGIVER: He'll cry, he'll drop to the floor, he'll sometimes hit me or my husband when we try to redirect him. Not hard enough to really hurt, but it's scary and it's exhausting. And then we're all starting the day already upset.\n" +
+        'BCBA: How many times a day would you say something like that happens, not just mornings?\n' +
+        "CAREGIVER: Oh, it's not just mornings. Anytime there's a transition. If he's on the iPad and we say it's time for dinner — meltdown. Homework time — meltdown. Getting in the bath — meltdown. I'd say probably four to six times a day where it really escalates.\n" +
+        'BCBA: And how long do those episodes typically last?\n' +
+        "CAREGIVER: If we wait it out, maybe fifteen minutes. If we give in and let him stay on the iPad, it stops faster. But we know we're not supposed to do that.\n" +
+        "BCBA: You're right that that can reinforce the behavior — we'll definitely talk through that. What does task refusal look like outside of transitions? Like during homework or chores?\n" +
+        "CAREGIVER: He just completely shuts down. He'll go limp, won't make eye contact, won't respond. Or he'll run to his room and lock the door. We've had to take the lock off his door because of that.\n" +
+        'BCBA: Has anything changed recently that made the concerns feel more urgent?\n' +
+        "CAREGIVER: His teacher called us last month. She said the refusal is happening at school too now. He was fine in kindergarten — small class, predictable day. First grade is bigger and louder and he can't handle it. She's had to call us to come pick him up twice.\n" +
+        'BCBA: Has he ever been asked to leave a program or classroom placement because of behavior?\n' +
+        "CAREGIVER: Not officially. But his teacher kind of hinted that they're having a meeting about his placement at the end of the year if things don't improve. That's honestly what pushed us to call you.\n" +
+        'BCBA: That context is really helpful. Has Marcus received any ABA services before?\n' +
+        'CAREGIVER: He had about six months when he was four. It stopped when we moved and we never got back into it. He made progress then — I think that\'s why we waited so long to come back. We kept thinking he\'d "catch up."\n' +
+        'BCBA: What do you remember working on in that earlier round of services?\n' +
+        "CAREGIVER: Following directions, mostly. And some communication stuff — he wasn't talking much at four. He's verbal now, but still short phrases mostly.\n" +
+        'BCBA: What other services is he currently getting?\n' +
+        "CAREGIVER: Speech therapy, once a week at school. That's it. We were doing OT but our insurance stopped covering it and we couldn't afford to pay out of pocket.\n" +
+        'BCBA: On a scale of one to ten, how much is all of this impacting your family right now?\n' +
+        "CAREGIVER: An eight. Maybe a nine on bad days. My husband and I are fighting more because we're so tired. His little sister is scared of him when he melts down. We don't go out much anymore because we never know when it's going to happen.\n" +
+        "BCBA: That's a lot to carry. What would feel different — like what would a good outcome of services look like to you?\n" +
+        "CAREGIVER: Honestly? I just want mornings to not be a war. I want him to be able to say 'I don't want to do this' instead of melting down. And I want to not dread bedtime every night.\n" +
+        'BCBA: Those are really clear and meaningful goals. We can absolutely build a plan around all of that.',
       draftState: 'blank',
       lastSavedAt: T_MARCUS,
     },
+
     self_help: {
       completionState: 'complete',
       notes:
-        'Toilet trained. Feeds independently with utensils. Needs verbal prompts for dressing. Hygiene requires step-by-step visual support.',
+        'Toilet trained (day and night). Feeds independently with spoon and fork — minimal spilling. Dressing: can manage loose-fitting clothes independently; buttons, zippers, and snaps require verbal prompting and occasional hand-over-hand. Hygiene: tooth brushing and hand-washing require step-by-step verbal cues — does not initiate independently. Hair combing requires full physical assistance. Bathing requires caregiver sequencing support. Does not pack school bag or prepare materials without prompting.',
+      transcript:
+        'BCBA: Tell me about how Marcus manages getting himself ready — dressing, hygiene, that kind of thing.\n' +
+        "CAREGIVER: He can put on a t-shirt and sweatpants by himself, but anything with buttons or zippers he needs help. He just gives up on those.\n" +
+        "BCBA: What about brushing his teeth or washing his hands?\n" +
+        "CAREGIVER: He'll do it if I stand there and tell him each step. 'Turn on the water. Put soap on your hands. Rub them together.' But if I leave the room it doesn't happen.\n" +
+        "BCBA: Does he remind himself, or does he need you to initiate it?\n" +
+        "CAREGIVER: I always have to start it. He'd skip it every day if I didn't.\n" +
+        "BCBA: What about eating?\n" +
+        "CAREGIVER: That's actually fine. He uses a fork and spoon, no problem. He won't try new foods though — very limited diet.\n" +
+        "BCBA: Any toileting concerns?\n" +
+        "CAREGIVER: No, that's been solid for a couple of years. Day and night.",
       draftState: 'blank',
       lastSavedAt: T_MARCUS,
     },
+
     daily_living: {
-      completionState: 'partial',
+      completionState: 'complete',
       notes:
-        '1-step directions: independent. 2-step: requires repetition. Attention span ~5–7 minutes on structured tasks.',
+        '1-step directions: independent in familiar contexts. 2-step: requires repetition or gestural cue, ~60% compliance without support. Attention on non-preferred structured tasks: 5–7 min before behavioral disruption; preferred tasks: up to 20 min. Uses visual schedule at school with moderate success — home visual schedule not yet in place. Cannot manage time, money, or community safety independently. Does not complete household chores without step-by-step prompting. Navigates home safely.',
+      transcript:
+        "BCBA: When you give Marcus a simple instruction at home, like 'put your shoes by the door' — does he follow it?\n" +
+        "CAREGIVER: Usually, yeah. One thing at a time he can do. It's when you chain things together that it falls apart.\n" +
+        "BCBA: So if you said 'put your shoes away and then come sit at the table'?\n" +
+        "CAREGIVER: He'd put the shoes away and then get distracted. Or he'd just not do either and walk away.\n" +
+        "BCBA: How long can he stay focused on something he doesn't want to do — like homework?\n" +
+        "CAREGIVER: Maybe five minutes on a good day before the complaining starts. Seven if we're lucky. He can sit with Minecraft for an hour straight.\n" +
+        "BCBA: Does his school use any visual supports?\n" +
+        "CAREGIVER: Yes, his teacher has a picture schedule on his desk. She says it helps, but he still needs reminders to check it.\n" +
+        "BCBA: Do you use anything like that at home?\n" +
+        "CAREGIVER: We've tried. We made a morning chart once but gave up after a week because of the meltdowns. We'd like to try again with some guidance.",
       draftState: 'blank',
       lastSavedAt: T_MARCUS,
     },
+
     safety: {
       completionState: 'complete',
       notes:
-        'Elopement: moderate risk. Aggression: mild, caregiver is primary target. SIB: not present. Supervision: constant.',
+        'Elopement: moderate risk — 2 confirmed attempts in past month, both during dysregulation near front door. No traffic exposure to date. Aggression: mild open-hand hitting directed at primary caregiver during iPad redirection — no injuries. SIB: not present. Weapons/hazards: none reported. Supervision level: constant. Secondary door lock recommended.',
       transcript:
-        "CAREGIVER: He's run out the front door twice this month. And he'll hit me when I try to redirect him from the iPad.\n" +
-        'BCBA: Has anyone been injured?\n' +
-        'CAREGIVER: No, not seriously.',
+        "BCBA: Let's talk about safety. Has Marcus ever tried to leave the house without permission?\n" +
+        "CAREGIVER: Twice this month. Both times he was upset about something — once about the iPad, once because I said we weren't going to the park. He just bolted for the front door.\n" +
+        "BCBA: Did he get outside?\n" +
+        "CAREGIVER: The first time I caught him at the door. The second time he actually got it open and stepped onto the porch before I got to him. That scared me a lot.\n" +
+        "BCBA: Is there a street close by?\n" +
+        "CAREGIVER: Yes, right at the end of the driveway. It's not a busy road but still.\n" +
+        "BCBA: Have you added any locks or barriers?\n" +
+        "CAREGIVER: We have a chain lock up high now. He can't reach it yet.\n" +
+        "BCBA: Good. What about aggression — does he ever hit or kick?\n" +
+        "CAREGIVER: He's hit me a few times when I take the iPad away. Open hand, not a fist. It doesn't really hurt but it's not okay.\n" +
+        "BCBA: Has he hurt himself intentionally — hitting his head, biting himself?\n" +
+        "CAREGIVER: No, nothing like that. I've never seen that.\n" +
+        "BCBA: Any sharp objects, medications, or other hazards he has access to?\n" +
+        "CAREGIVER: No. We keep all of that locked up.",
       draftState: 'blank',
       lastSavedAt: T_MARCUS,
     },
+
     communication: {
       completionState: 'complete',
       notes:
-        'Verbal, 3–4 word phrases. MLU approximately 3.5. Intelligibility ~80% to unfamiliar listener. FCT needed — currently uses behavior to refuse.',
+        'Verbal, primarily 3–4 word phrases (e.g., "want juice," "no school," "give me iPad"). MLU ~3.5 morphemes. Intelligibility ~80% to unfamiliar listeners. Spontaneous language mostly requesting and protesting — minimal initiating of conversation or commenting. Does not ask for help verbally — relies on crying, hitting, or leading caregiver by hand. No AAC system in place. FCT clinically indicated. Speech therapy 1x/wk at school.',
       transcript:
-        "CAREGIVER: He talks but not full sentences. He'll say 'want juice' or 'no school'.\n" +
-        'BCBA: Does he ask for help?\n' +
-        'CAREGIVER: He just cries or hits instead.',
+        "BCBA: Tell me about how Marcus communicates. Does he use words?\n" +
+        "CAREGIVER: Yes, he talks. But it's mostly short things — 'want juice,' 'no bath,' 'watch iPad.' Not really sentences.\n" +
+        "BCBA: Does he start conversations, or does he mostly respond when you talk to him?\n" +
+        "CAREGIVER: He'll ask for things he wants. But he doesn't really come up and say 'hey Mom, I saw something funny today.' It's mostly just requests or protests.\n" +
+        "BCBA: When he can't get what he wants or doesn't understand something, what does he do?\n" +
+        "CAREGIVER: He'll whine, then cry, then hit if it goes on long enough. Or he'll just grab my hand and drag me to whatever he wants. He never says 'help' or 'I don't understand.'\n" +
+        "BCBA: Has anyone suggested a communication device or picture system?\n" +
+        "CAREGIVER: His speech therapist mentioned it once but said to keep trying with verbal first. We don't have anything like that.\n" +
+        "BCBA: How well do people outside the family understand him?\n" +
+        "CAREGIVER: Maybe eight out of ten times if they're paying attention. His teacher understands him pretty well now but it took a few weeks.",
       draftState: 'blank',
       lastSavedAt: T_MARCUS,
     },
-    behavior_targets: {
+
+    self_stim: {
+      completionState: 'complete',
+      notes:
+        'Echolalia: functional and non-functional. Scripts phrases from YouTube and cartoon videos throughout the day — increases when dysregulated. Hand flapping: observed during excitement and anticipation (e.g., before preferred activities). Lining up objects (toy cars, crayons, shoes): high-frequency during unstructured time — Marcus becomes distressed if arrangement is disrupted. No injurious stims reported. Behaviors do not currently impair learning when managed contextually. Not identified as priority reduction targets — monitoring only.',
+      transcript:
+        "BCBA: Does Marcus have any repetitive behaviors or routines that stand out to you?\n" +
+        "CAREGIVER: Oh, yes. The lining up. He lines everything up — his cars, his crayons, his shoes by the door. Everything has to be in a specific order.\n" +
+        "BCBA: What happens if something gets moved?\n" +
+        "CAREGIVER: Full meltdown. His little sister knocked over his cars once and he screamed for twenty minutes. He had to put every single one back in the exact same spot.\n" +
+        "BCBA: Does he flap his hands at all?\n" +
+        "CAREGIVER: When he's excited — like if we say we're going to McDonald's or when his favorite show comes on. He flaps and sometimes jumps up and down.\n" +
+        "BCBA: What about repeating things he's heard — from TV or things other people say?\n" +
+        "CAREGIVER: All the time. He'll quote the same YouTube video over and over. Sometimes it seems random, but other times I think he's using it to express something. Like if he's upset he'll say a line from a show where a character is upset.\n" +
+        "BCBA: Does that ever interfere with him communicating what he actually needs?\n" +
+        "CAREGIVER: Sometimes yes. You can't always tell if he's scripting or trying to say something real.",
+      draftState: 'blank',
+      lastSavedAt: T_MARCUS,
+    },
+
+    medical_necessity: {
+      completionState: 'complete',
+      notes:
+        'ASD Level 2 (F84.0) diagnosed by Dr. R. Morales, MD — April 2026 (most recent confirmation). Prior diagnosis documented at age 3. No current standardized adaptive behavior scores on file — Vineland-3 to be administered at intake. Prior ABA: 6 months at age 4, discontinued due to family relocation — no discharge summary available. Current co-treatments: speech-language therapy 1x/week (school-based). OT discontinued — insurance lapsed. Requested service intensity: 20 hr/wk RBT direct instruction + 2 hr/wk BCBA supervision + 1 hr/wk caregiver training. Behaviors (task refusal, elopement, aggression) impair participation in educational and home settings and meet criteria for medical necessity under ABA benefit.',
+      draftState: 'blank',
+      lastSavedAt: T_MARCUS,
+    },
+
+    skill_acquisitions: {
       completionState: 'partial',
-      notes: 'Task refusal: operational def TBD. Elopement: operational def TBD.',
+      skillGoals: [
+        {
+          id: 'sg-marcus-1',
+          targetSkill: 'Following two-step directions',
+          operationalDefinition:
+            'Client independently completes two sequential verbal instructions (e.g., "Pick up your backpack and bring it to the door") within 10 seconds of the directive, without repetition or gestural prompting.',
+          definitionIsAiGenerated: false,
+          definitionIsLoading: false,
+          teachingStrategies: ['dtt', 'behavioral_momentum', 'least_to_most'],
+          teachingStrategiesOther: '',
+          promptingLevel: 'verbal',
+          promptingLevelCombination: '',
+          baselinePercent: '20',
+          baselineOpportunities: '10',
+          baselinePromptingDesc: 'verbal',
+          masteryCriteriaPercent: '80',
+          masteryCriteriaSessions: '3',
+          masteryCriteriaSettings: '2',
+          masteryCriteriaPrompting: 'independent',
+          generalizationNotes:
+            'Skill will be practiced across multiple people, settings, materials, and environments to promote maintenance and generalization of acquired skills.',
+        },
+        {
+          id: 'sg-marcus-2',
+          targetSkill: 'Functional Communication Training (FCT) — protest',
+          operationalDefinition:
+            'Client uses a verbal phrase or AAC output (e.g., "No thank you," "I need a break") to refuse or protest a non-preferred task or transition, instead of engaging in challenging behavior.',
+          definitionIsAiGenerated: false,
+          definitionIsLoading: false,
+          teachingStrategies: ['fct', 'errorless_teaching', 'differential_reinforcement'],
+          teachingStrategiesOther: '',
+          promptingLevel: 'verbal',
+          promptingLevelCombination: '',
+          baselinePercent: '0',
+          baselineOpportunities: '10',
+          baselinePromptingDesc: 'full physical',
+          masteryCriteriaPercent: '80',
+          masteryCriteriaSessions: '3',
+          masteryCriteriaSettings: '2',
+          masteryCriteriaPrompting: 'independent',
+          generalizationNotes:
+            'Skill will be practiced across multiple people, settings, materials, and environments to promote maintenance and generalization of acquired skills.',
+        },
+      ],
+      draftState: 'blank',
+      lastSavedAt: T_MARCUS,
+    },
+
+    behavior_targets: {
+      completionState: 'complete',
+      notes:
+        'Task Refusal: operationally defined as verbal refusal ("no," "stop"), going limp, dropping to floor, or leaving the work area within 10 seconds of a directive without initiating compliance. Does not include complaining that transitions to compliance within 10 seconds. Baseline: ~8 occurrences per observed session per caregiver report.\n\nElopement: operationally defined as moving toward or through an exterior door or gate without adult permission or a caregiver-initiated transition cue. Excludes movement within the home. Baseline: ~3 attempts per week per caregiver report.\n\nAggression: operationally defined as open-hand hitting directed at a caregiver during redirection from preferred items (primarily iPad). Mild intensity — no injury reported. Baseline: ~2–3 incidents per week. Monitoring only at this time — will be elevated to primary target if frequency increases.',
       indicators: [
         { id: 'b1', label: 'Task refusal', count: 8, isCustom: true, unit: 'count' },
         { id: 'b2', label: 'Elopement attempt', count: 3, isCustom: true, unit: 'count' },
+        { id: 'b3', label: 'Aggression (hitting)', count: 2, isCustom: true, unit: 'count' },
       ],
+      transcript:
+        "BCBA: Let's make sure we have really clear definitions for Marcus's behaviors so the team can measure them consistently. Starting with task refusal — what does the very beginning of that look like?\n" +
+        "CAREGIVER: Usually he just says 'no' or 'stop.' Then if we push he'll go limp and slide off his chair. Or he walks away and goes to his room.\n" +
+        "BCBA: Is there a point where he starts complaining but then actually does the task anyway?\n" +
+        "CAREGIVER: Sometimes yeah — he'll grumble but eventually do it. That's different from when he fully shuts down.\n" +
+        "BCBA: Good distinction. So we'd count refusal only when he doesn't follow through within maybe ten seconds?\n" +
+        "CAREGIVER: That seems right.\n" +
+        "BCBA: For elopement — is it only going toward outside doors, or does bolting to his room count?\n" +
+        "CAREGIVER: I'd say just outside. Running to his room is annoying but it's not unsafe.\n" +
+        "BCBA: Agreed. And the hitting — how often does that happen compared to the other two?\n" +
+        "CAREGIVER: Less often. Maybe two or three times a week, only when I'm taking something away.\n" +
+        "BCBA: And only toward you, not his sister or his dad?\n" +
+        "CAREGIVER: Mostly me. His dad occasionally. Never his sister.",
+      draftState: 'blank',
+      lastSavedAt: T_MARCUS,
+    },
+
+    crisis_plan: {
+      completionState: 'complete',
+      notes:
+        'No imminent risk of serious self-harm. Elopement is the primary safety concern. Caregiver de-escalation protocol: (1) secure exterior doors immediately; (2) reduce all active demands — do not re-issue directives during episode; (3) move to a neutral space and wait; (4) do not provide access to denied item (iPad) during or immediately following episode. For aggression: create physical distance, avoid restraint unless injury imminent, document incident. Emergency threshold: 911 if Marcus exits property unsupervised and cannot be immediately retrieved, or if aggression results in injury. BCBA to provide written protocol card at intake. Quarterly safety review scheduled.',
+      transcript:
+        "BCBA: I want to make sure you have a clear plan for when things escalate. Right now when he's in the middle of a meltdown — what do you do?\n" +
+        "CAREGIVER: Mostly we just try to stay calm and wait it out. Sometimes we try to redirect him but that usually makes it worse.\n" +
+        "BCBA: That instinct to wait is actually correct. The key thing is not to give access to whatever was denied — the iPad, the activity — because that teaches him the meltdown works.\n" +
+        "CAREGIVER: We know. It's just so hard when it's been going on for fifteen minutes and you just need to get out the door.\n" +
+        "BCBA: Completely understandable. We'll work on building his tolerance so those episodes get shorter. For elopement — if he gets to the door, what's the protocol?\n" +
+        "CAREGIVER: We grab him. But he's getting faster.\n" +
+        "BCBA: The chain lock up high is the right call for now. We'd also recommend a door alarm — a simple chime so you always know when an exterior door opens, even if you're in another room.\n" +
+        "CAREGIVER: Oh, that's a good idea. We don't have that.\n" +
+        "BCBA: At what point would you call 911?\n" +
+        "CAREGIVER: If he actually got out to the street and I couldn't catch him, definitely. Or if he hurt someone badly.\n" +
+        "BCBA: Those are exactly the right thresholds. I'll put that in writing for you so the whole family is on the same page.",
       draftState: 'blank',
       lastSavedAt: T_MARCUS,
     },

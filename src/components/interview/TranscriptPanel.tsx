@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Flag, FileText } from 'lucide-react';
 import { useSessionStore } from '@/store/sessionStore';
 import { getSectionConfig } from '@/utils/sectionConfig';
@@ -44,32 +45,32 @@ export const TranscriptPanel = ({
 }: TranscriptPanelProps) => {
   const config = getSectionConfig(sectionKey);
   const flagTranscript = useSessionStore((s) => s.flagTranscript);
-  const updateSectionNotes = useSessionStore((s) => s.updateSectionNotes);
   const section = useSessionStore(
     (s) => s.sessions.find((sess) => sess.id === sessionId)?.sections[sectionKey] ?? null,
   );
+  const [copied, setCopied] = useState(false);
 
   if (!transcript) return null;
-
   const duration = section?.recordingDurationSeconds ?? 0;
   const lines = parseLines(transcript);
 
-  const handlePushToNotes = () => {
-    const currentNotes = section?.notes ?? '';
-    const formatted = lines
+  const handleCopyTranscript = () => {
+    const fullText = lines
       .map((l) => (l.speaker ? `${l.speaker}: ${l.text}` : l.text))
       .join('\n');
-    const separator = currentNotes.trim() ? '\n\n— Transcript —\n' : '— Transcript —\n';
-    updateSectionNotes(sessionId, sectionKey, currentNotes + separator + formatted);
+    navigator.clipboard.writeText(fullText).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
   };
 
   return (
     <div
-      className="overflow-hidden"
       style={{
-        maxHeight: isVisible ? 600 : 0,
+        maxHeight: isVisible ? '80vh' : 0,
         opacity: isVisible ? 1 : 0,
-        transition: 'max-height 250ms ease-out, opacity 200ms ease-out',
+        overflow: 'hidden',
+        transition: 'max-height 300ms ease-out, opacity 200ms ease-out',
       }}
       aria-hidden={!isVisible}
     >
@@ -116,7 +117,10 @@ export const TranscriptPanel = ({
         </div>
 
         {/* ── Lines ────────────────────────────────────────────── */}
-        <div className="flex flex-col gap-3 px-4 py-4">
+        <div
+          className="flex flex-col gap-3 px-4 py-4 overflow-y-auto"
+          style={{ maxHeight: 'calc(80vh - 140px)' }}
+        >
           {lines.map((line, i) => (
             <div key={i} className="flex flex-col gap-0.5">
               {line.speaker && (
@@ -145,6 +149,7 @@ export const TranscriptPanel = ({
         >
           <button
             onClick={() => flagTranscript(sessionId, sectionKey, !isFlagged)}
+            title="AI will prioritise your manual notes over this recording"
             className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[12px] transition-colors duration-150"
             style={{
               color: isFlagged ? '#F59E0B' : 'var(--text-tertiary)',
@@ -158,23 +163,17 @@ export const TranscriptPanel = ({
           </button>
 
           <button
-            onClick={handlePushToNotes}
+            onClick={handleCopyTranscript}
             className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[12px] transition-colors duration-150"
             style={{
-              color: 'var(--text-tertiary)',
+              color: copied ? 'var(--status-complete)' : 'var(--text-tertiary)',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
             }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.color = 'var(--text-secondary)';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.color = 'var(--text-tertiary)';
-            }}
           >
             <FileText size={11} />
-            Push to notes
+            {copied ? '✓ Copied' : 'Copy transcript'}
           </button>
         </div>
       </div>

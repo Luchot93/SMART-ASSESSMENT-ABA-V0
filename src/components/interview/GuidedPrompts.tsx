@@ -23,7 +23,7 @@ export const GuidedPrompts = ({ sessionId, sectionKey }: GuidedPromptsProps) => 
   const clientFirstName = session?.clientName.split(' ')[0] ?? 'the client';
 
   const fillPrompt = (text: string) =>
-    text.replace(/\[client name\]/gi, clientFirstName);
+    text.replace(/\[client(?:\s+name)?\]/gi, clientFirstName);
 
   const [cptCounts, setCptCounts] = useState<Record<string, string>>({});
   const [showTranscript, setShowTranscript] = useState(

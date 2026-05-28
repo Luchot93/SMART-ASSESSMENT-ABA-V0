@@ -531,12 +531,40 @@ const skill_acquisitions: SectionConfig = {
   recordingValue: 3,
   recordingNote: 'Section UI is in development — use notes field for now.',
   freeTextPrompt:
-    'Describe skill acquisition targets and maladaptive behaviors to reduce through the treatment plan. The final UI for this section is being defined with BCBA input and will be updated after validation.',
+    'Use the goal builder below to document each skill target, or add clinical notes here.',
   notApplicableForRecording: false,
   hasQuickTap: false,
   allowsCustomIndicators: false,
-  isSupposition: true,
-  guidedPrompts: [],
+  isSupposition: false,
+  guidedPrompts: [
+    {
+      groupTitle: 'Skill identification',
+      prompts: [
+        "What skills would most improve [client]'s independence at home right now?",
+        "What daily living skills is [client] working toward — dressing, toileting, feeding?",
+        "What communication skills would reduce the most frustration for [client]?",
+        "Are there safety skills that are urgent — crossing streets, stranger danger, emergency response?",
+        "What social skills would help [client] connect with peers or family?",
+      ],
+    },
+    {
+      groupTitle: 'Baseline & current level',
+      prompts: [
+        "Does [client] attempt this skill at all, or is it not yet in their repertoire?",
+        "How many times out of 10 does [client] do this correctly right now?",
+        "What level of prompting does [client] currently need to complete this skill?",
+        "Has [client] shown this skill in the past and lost it, or is it a new target?",
+      ],
+    },
+    {
+      groupTitle: 'Generalization context',
+      prompts: [
+        "Does [client] only show this skill in certain places or with certain people?",
+        "Is this a skill the caregiver can practice at home between sessions?",
+        "What environments are most important — home, school, community?",
+      ],
+    },
+  ],
   defaultIndicators: [],
   aiNeeds: [
     'Skill acquisition targets (list)',

@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useSessionStore } from '@/store/sessionStore';
 import { applyGrammarCorrections } from '@/utils/grammarCheck';
-import type { SectionKey } from '@/types';
+import type { DraftState, SectionKey, SkillAcquisitionGoal } from '@/types';
 import { SECTION_ORDER } from '@/types';
 
 interface GenerateButtonProps {
@@ -62,6 +62,224 @@ function genericDraft(clientName: string, sectionTitle: string): string {
   return `[AI Draft — ${sectionTitle}]\n\nBased on information collected during the clinical interview for ${clientName}, this section will be populated with clinician-reviewed content. Please review, edit, and approve before generating the final assessment document.`;
 }
 
+// ─── Skill Acquisitions template fallback ────────────────────────────────────
+// Used when the Anthropic API is unavailable (no key, 4xx, network error).
+// Formats the goals captured in the store into structured clinical Markdown
+// without requiring the API — so the section always shows real data.
+
+function buildStructuredSkillsDraft(goals: SkillAcquisitionGoal[]): string {
+  if (goals.length === 0) {
+    return 'Skill acquisition targets to be determined. [BCBA to complete: add skill acquisition goals using the goal builder in the interview section.]';
+  }
+
+  const TEACHING_LABELS: Record<string, string> = {
+    dtt: 'DTT',
+    net: 'NET',
+    fct: 'FCT',
+    behavioral_momentum: 'Behavioral Momentum',
+    errorless_teaching: 'Errorless Teaching',
+    most_to_least: 'Most-to-Least Prompting',
+    least_to_most: 'Least-to-Most Prompting',
+    graduated_guidance: 'Graduated Guidance',
+    modeling: 'Modeling',
+    chaining: 'Chaining',
+    prompt_fading: 'Prompt Fading',
+    visual_supports: 'Visual Supports',
+    task_analysis: 'Task Analysis',
+    incidental_teaching: 'Incidental Teaching',
+    differential_reinforcement: 'Differential Reinforcement (DRA/DRI/DRO)',
+    role_modeling: 'Role Modeling',
+    social_stories: 'Social Stories',
+    reinforcement_procedures: 'Reinforcement Procedures',
+  };
+
+  return goals
+    .map((g, i) => {
+      const strategies =
+        [
+          ...g.teachingStrategies.map((k) => TEACHING_LABELS[k] ?? k),
+          ...(g.teachingStrategiesOther ? [g.teachingStrategiesOther] : []),
+        ].join(', ') || '[BCBA to complete: select teaching strategies]';
+
+      const targetSkill = g.targetSkill || '[BCBA to complete: enter target skill]';
+      const opDef = g.operationalDefinition || '[BCBA to complete: enter operational definition]';
+      const blPct = g.baselinePercent || '0';
+      const blOpps = g.baselineOpportunities || 'multiple';
+      const blPrompt = g.baselinePromptingDesc || 'maximum';
+      const mcPct = g.masteryCriteriaPercent || '80';
+      const mcSess = g.masteryCriteriaSessions || '3';
+      const mcSet = g.masteryCriteriaSettings || '2';
+      const mcPrompt = g.masteryCriteriaPrompting || 'independent';
+      const genNotes =
+        g.generalizationNotes ||
+        'Skill will be practiced across multiple people, settings, materials, and environments to promote maintenance and generalization of acquired skills.';
+
+      const stoTarget = Math.max(10, Math.round(Number(mcPct) / 8 / 5) * 5);
+      const currentLevel =
+        blPct === '0' || blPct === '' ? 'NEW' : `${blPct}% correct with ${blPrompt} prompting`;
+
+      return `**Goal ${i + 1}: ${targetSkill}**
+
+Operational Definition: ${opDef}
+
+Teaching Strategies: ${strategies}
+
+| Target Behavior | 6-Month Target (STO) | Baseline Data | Current Level | Mastery Criteria (LTO) |
+|---|---|---|---|---|
+| ${targetSkill} | Client will demonstrate ${targetSkill} in ${stoTarget}% of opportunities per week for 4 consecutive weeks. | ${blPct}% across ${blOpps} opportunities | ${currentLevel} | Client will demonstrate ${targetSkill} with ${mcPct}% accuracy across ${mcSess} consecutive sessions across ${mcSet} people/settings with ${mcPrompt} level of prompting. |
+
+Generalization & Maintenance: ${genNotes}`;
+    })
+    .join('\n\n---\n\n');
+}
+
+// ─── Skill Acquisitions AI draft ─────────────────────────────────────────────
+
+const generateSkillAcquisitionsDraft = async (sessionId: string): Promise<string> => {
+  // Read directly from the store — NOT from the React closure snapshot.
+  // By the time this function runs (after 8+ seconds of sequential section generation),
+  // the session object captured in handleGenerate is stale. getState() always returns
+  // the live store value at this exact moment.
+  const liveSection = useSessionStore
+    .getState()
+    .sessions.find((s) => s.id === sessionId)
+    ?.sections['skill_acquisitions'];
+
+  const goals = liveSection?.skillGoals ?? [];
+
+  console.log('generateSkillAcquisitionsDraft called, goals:', goals.length, goals.map(g => g.targetSkill));
+
+  if (goals.length === 0) {
+    return 'Skill acquisition targets to be determined. [BCBA to complete: add skill acquisition goals using the goal builder in the interview section.]';
+  }
+
+  const goalsData = goals.map((g) => ({
+    targetSkill: g.targetSkill || '[Skill name not entered]',
+    operationalDefinition: g.operationalDefinition || '[Definition not entered]',
+    baselinePercent: g.baselinePercent || '0',
+    baselineOpportunities: g.baselineOpportunities || 'multiple',
+    baselinePromptingDesc: g.baselinePromptingDesc || 'maximum',
+    promptingLevel: g.promptingLevel || 'full_physical',
+    masteryCriteriaPercent: g.masteryCriteriaPercent || '80',
+    masteryCriteriaSessions: g.masteryCriteriaSessions || '3',
+    masteryCriteriaSettings: g.masteryCriteriaSettings || '2',
+    masteryCriteriaPrompting: g.masteryCriteriaPrompting || 'independent',
+    teachingStrategies: g.teachingStrategies ?? [],
+    teachingStrategiesOther: g.teachingStrategiesOther || '',
+    generalizationNotes:
+      g.generalizationNotes ||
+      'Skill will be practiced across multiple people, settings, materials, and environments to promote maintenance and generalization of acquired skills.',
+  }));
+
+  const TEACHING_STRATEGY_LABELS: Record<string, string> = {
+    dtt: 'Discrete Trial Training (DTT)',
+    net: 'Natural Environment Teaching (NET)',
+    fct: 'Functional Communication Training (FCT)',
+    behavioral_momentum: 'Behavioral Momentum',
+    errorless_teaching: 'Errorless Teaching',
+    most_to_least: 'Most-to-Least Prompting',
+    least_to_most: 'Least-to-Most Prompting',
+    graduated_guidance: 'Graduated Guidance',
+    modeling: 'Modeling',
+    chaining: 'Chaining',
+    prompt_fading: 'Prompt Fading',
+    visual_supports: 'Visual Supports',
+    task_analysis: 'Task Analysis',
+    incidental_teaching: 'Incidental Teaching',
+    differential_reinforcement: 'Differential Reinforcement (DRA/DRI/DRO)',
+    role_modeling: 'Role Modeling',
+    social_stories: 'Social Stories',
+    reinforcement_procedures: 'Reinforcement Procedures',
+  };
+
+  const PROMPTING_LABELS: Record<string, string> = {
+    independent: 'Independent',
+    verbal: 'Verbal Prompt',
+    gestural: 'Gestural Prompt',
+    model: 'Model Prompt',
+    partial_physical: 'Partial Physical Prompt',
+    full_physical: 'Full Physical Prompt',
+    combination: 'Combination of Prompts',
+  };
+
+  const formattedGoals = goalsData
+    .map((g) => {
+      const strategies =
+        [
+          ...g.teachingStrategies.map((k) => TEACHING_STRATEGY_LABELS[k] ?? k),
+          ...(g.teachingStrategiesOther ? [g.teachingStrategiesOther] : []),
+        ].join(', ') || '[BCBA to complete: select teaching strategies]';
+
+      const currentLevel =
+        g.baselinePercent === '0' || g.baselinePercent === ''
+          ? 'NEW'
+          : (PROMPTING_LABELS[g.promptingLevel] ?? g.promptingLevel);
+
+      return `
+GOAL:
+Target Skill: ${g.targetSkill}
+Operational Definition: ${g.operationalDefinition}
+Teaching Strategies: ${strategies}
+Baseline: ${g.baselinePercent}% correct across ${g.baselineOpportunities} opportunities with ${g.baselinePromptingDesc} level of prompting
+Current Level: ${currentLevel}
+Mastery Target: ${g.masteryCriteriaPercent}% accuracy across ${g.masteryCriteriaSessions} consecutive sessions across ${g.masteryCriteriaSettings} people/settings with ${g.masteryCriteriaPrompting} level of prompting
+Generalization: ${g.generalizationNotes}
+      `.trim();
+    })
+    .join('\n\n---\n\n');
+
+  const apiKey = (import.meta.env as Record<string, string | undefined>).VITE_ANTHROPIC_API_KEY;
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
+      ...(apiKey ? { 'x-api-key': apiKey } : {}),
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 2000,
+      messages: [
+        {
+          role: 'user',
+          content:
+            `You are a BCBA writing the Skills/Replacement Behaviors section of an ABA Initial Assessment document.\n\n` +
+            `Format the following skill acquisition goals exactly as they would appear in a clinical ABA document.\n\n` +
+            `For EACH goal, produce this structure:\n\n` +
+            `**Target Skill: [targetSkill]**\n\n` +
+            `Operational Definition: [operationalDefinition]\n\n` +
+            `Teaching Strategies: [strategies as a natural comma-separated sentence]\n\n` +
+            `| Target Behavior | 6-Month Target Level (Short-Term Objective) | Baseline Data | Current Level | Mastery Criteria (Long-Term Goal) |\n` +
+            `|---|---|---|---|---|\n` +
+            `| [targetSkill] | Client will demonstrate [targetSkill] in [masteryCriteriaPercent divided by 8, rounded to nearest 5]% of opportunities per week for 4 consecutive weeks. | [baselinePercent]% of opportunities | [currentLevel] | Client will demonstrate [targetSkill] with [masteryCriteriaPercent]% accuracy across [masteryCriteriaSessions] consecutive sessions across [masteryCriteriaSettings] people/settings with [masteryCriteriaPrompting] level of prompting. |\n\n` +
+            `Generalization & Maintenance: [generalizationNotes]\n\n` +
+            `---\n\n` +
+            `Rules:\n` +
+            `- Use "Client" as the placeholder name throughout — never use a real name\n` +
+            `- If operationalDefinition looks like test/placeholder text (random letters, very short), write: [BCBA to complete: refine operational definition]\n` +
+            `- If currentLevel is NEW, write NEW in the Current Level column\n` +
+            `- Otherwise write the prompting level as the Current Level\n` +
+            `- For the STO (6-Month Target), the percentage is always masteryCriteriaPercent ÷ 8, rounded to the nearest 5 (minimum 10%). Example: 80% mastery → STO at 10%\n` +
+            `- Separate each goal with a horizontal rule line\n` +
+            `- Write in formal clinical ABA documentation language\n` +
+            `- Do not add any intro paragraph or explanation — output only the formatted goals\n\n` +
+            `Here are the goals to format:\n\n` +
+            formattedGoals,
+        },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Anthropic API error ${response.status}: ${response.statusText}`);
+  }
+
+  const data = (await response.json()) as { content?: { text: string }[] };
+  return data.content?.[0]?.text.trim() ?? 'Skill acquisition targets to be determined.';
+};
+
 // ─── Sequential animation constants ──────────────────────────────────────────
 
 // Which sections get actual drafts (in order they animate)
@@ -105,7 +323,30 @@ export const GenerateButton = ({ sessionId }: GenerateButtonProps) => {
       await new Promise<void>((res) => setTimeout(res, SECTION_DURATION_MS));
 
       const section = session.sections[key];
-      if (section && section.completionState !== 'empty') {
+
+      // skill_acquisitions bypasses the completionState guard — generateSkillAcquisitionsDraft
+      // reads live from the store and handles empty goals itself via buildStructuredSkillsDraft.
+      if (key === 'skill_acquisitions') {
+        try {
+          const skillDraft = await generateSkillAcquisitionsDraft(sessionId);
+          const skillDraftState: DraftState = skillDraft.includes('[BCBA to complete')
+            ? 'partial'
+            : 'drafted';
+          setDraftContent(sessionId, 'skill_acquisitions', skillDraft, skillDraftState, skillDraft);
+          rawDrafts[key] = skillDraft;
+        } catch (err) {
+          // API unavailable — format goals using the template fallback
+          console.warn('Skill acquisitions AI draft failed, using template fallback:', err);
+          const liveSect = useSessionStore
+            .getState()
+            .sessions.find((s) => s.id === sessionId)?.sections['skill_acquisitions'];
+          const fallbackGoals = liveSect?.skillGoals ?? [];
+          const content = buildStructuredSkillsDraft(fallbackGoals);
+          const state: DraftState = content.includes('[BCBA to complete') ? 'partial' : 'drafted';
+          setDraftContent(sessionId, 'skill_acquisitions', content, state, content);
+          rawDrafts[key] = content;
+        }
+      } else if (section && section.completionState !== 'empty') {
         const content =
           MARCUS_DRAFTS[key] ?? genericDraft(clientName, section.title ?? key);
         // Store raw draft immediately so the UI feels responsive
